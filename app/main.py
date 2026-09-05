@@ -34,10 +34,14 @@ app.include_router(subjects.router)
 app.include_router(parent.router)
 app.include_router(billing.router)
 
-@app.get("/", response_class=HTMLResponse)
+@app.api_route("/", methods=["GET", "HEAD"], response_class=HTMLResponse)
 def landing_page(request: Request, db: Session = Depends(get_db)):
     user = get_current_user_optional(request, db)
     return templates.TemplateResponse(request=request, name="landing.html", context={"user": user})
+
+@app.api_route("/health", methods=["GET", "HEAD"])
+def health_check():
+    return {"status": "healthy"}
 
 if __name__ == "__main__":
     import uvicorn
