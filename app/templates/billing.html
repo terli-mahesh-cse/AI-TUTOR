@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+
+{% block title %}Pricing & Subscription — AI-Tutor Pro{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto px-4 py-12" x-data="{ billingCycle: 'monthly' }">
+    
+    <!-- Title -->
+    <div class="text-center max-w-2xl mx-auto mb-12">
+        <span class="text-xs font-bold uppercase tracking-wider text-indigoPrimary dark:text-indigo-400">Subscription Plans</span>
+        <h1 class="text-3xl sm:text-4xl font-heading font-bold text-slate-900 dark:text-white mt-1">Unlock Unlimited AI Learning</h1>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">Get 24/7 unlimited Socratic tutoring chat, instant custom topic quizzes, and deep analytics.</p>
+        
+        <!-- Monthly / Yearly Toggle -->
+        <div class="mt-8 inline-flex items-center bg-slate-100 dark:bg-slate-800 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700">
+            <button @click="billingCycle = 'monthly'" :class="billingCycle === 'monthly' ? 'bg-white dark:bg-darkCard text-slate-900 dark:text-white shadow-sm' : 'text-slate-500'" class="px-5 py-2 rounded-xl text-xs font-semibold transition-all">
+                Monthly Billing
+            </button>
+            <button @click="billingCycle = 'yearly'" :class="billingCycle === 'yearly' ? 'bg-white dark:bg-darkCard text-slate-900 dark:text-white shadow-sm' : 'text-slate-500'" class="px-5 py-2 rounded-xl text-xs font-semibold transition-all flex items-center">
+                Yearly Billing <span class="ml-1.5 text-[10px] bg-mintAccent text-white px-1.5 py-0.5 rounded-full font-bold">SAVE 20%</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Pricing Cards Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        
+        <!-- Free Tier -->
+        <div class="bg-white dark:bg-darkCard p-8 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+            <div>
+                <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white">Free Plan</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Basic daily practice</p>
+                <div class="my-6">
+                    <span class="text-4xl font-extrabold text-slate-900 dark:text-white">$0</span>
+                    <span class="text-slate-500 text-sm">/ forever</span>
+                </div>
+                <ul class="space-y-3.5 text-sm text-slate-600 dark:text-slate-300">
+                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>10 AI Tutor Messages per day</li>
+                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>2 AI Generated Quizzes per day</li>
+                    <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>Access to all 5 Core Subjects</li>
+                </ul>
+            </div>
+            
+            <div class="mt-8">
+                {% if not user.is_pro %}
+                <span class="block w-full py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-center font-semibold text-xs text-slate-500">
+                    Current Active Plan
+                </span>
+                {% else %}
+                <span class="block w-full py-3 rounded-xl bg-slate-100 dark:bg-slate-800 text-center font-semibold text-xs text-slate-500">
+                    Basic Tier
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Pro Tier -->
+        <div class="bg-white dark:bg-darkCard p-8 rounded-3xl border-2 border-indigoPrimary shadow-xl relative flex flex-col justify-between">
+            <div class="absolute -top-3.5 right-6 bg-gradient-to-r from-indigoPrimary to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                Recommended
+            </div>
+
+            <div>
+                <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white">AI-Tutor Pro</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Unlimited learning & exam prep</p>
+
+                <div class="my-6">
+                    <span class="text-4xl font-extrabold text-slate-900 dark:text-white" x-text="billingCycle === 'monthly' ? '$9.99' : '$7.99'"></span>
+                    <span class="text-slate-500 text-sm" x-text="billingCycle === 'monthly' ? '/ month' : '/ month (billed annually)'"></span>
+                </div>
+
+                <ul class="space-y-3.5 text-sm text-slate-600 dark:text-slate-300">
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-4 h-4 text-mintAccent mr-2.5"></i><strong>Unlimited</strong> Socratic AI Chat</li>
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-4 h-4 text-mintAccent mr-2.5"></i><strong>Unlimited</strong> Claude AI Quizzes</li>
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-4 h-4 text-mintAccent mr-2.5"></i>Weak Areas & Remediation Analytics</li>
+                    <li class="flex items-center"><i data-lucide="check-circle-2" class="w-4 h-4 text-mintAccent mr-2.5"></i>Parent / Teacher Progress Link</li>
+                </ul>
+            </div>
+
+            <div class="mt-8">
+                {% if user.is_pro %}
+                <span class="block w-full py-3.5 rounded-xl bg-emerald-100 text-emerald-700 font-bold text-center text-xs">
+                    ✓ You are a Pro Member!
+                </span>
+                {% else %}
+                <form action="/billing/create-checkout-session" method="POST">
+                    <button type="submit" class="w-full py-3.5 rounded-xl bg-indigoPrimary hover:bg-indigoHover text-white font-semibold text-sm shadow-md shadow-indigo-500/20 transition-all flex items-center justify-center space-x-2">
+                        <i data-lucide="credit-card" class="w-4 h-4"></i>
+                        <span>Upgrade Now via Stripe</span>
+                    </button>
+                </form>
+                {% endif %}
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

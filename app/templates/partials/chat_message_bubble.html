@@ -1,0 +1,8 @@
+<div class="flex items-start space-x-3 justify-end animate-fade-in">
+    <div class="max-w-2xl p-4 rounded-2xl text-sm leading-relaxed bg-indigoPrimary text-white rounded-tr-none shadow-md shadow-indigo-500/10">
+        <div class="prose dark:prose-invert max-w-none break-words">{{ message.content }}</div>
+    </div>
+    <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigoPrimary font-bold flex items-center justify-center flex-shrink-0 text-xs border border-indigo-200 dark:border-indigo-800">
+        {{ user.full_name[:1].upper() }}
+    </div>
+</div>

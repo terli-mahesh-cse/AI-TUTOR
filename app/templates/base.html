@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en" x-data="{ darkMode: $persist(false).as('ai_tutor_dark') }" :class="{ 'dark': darkMode }">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}AI-Tutor — AI-Powered Personal Learning Platform{% endblock %}</title>
+    <meta name="description" content="AI-powered 1-on-1 tutoring platform with Socratic guidance, instant quizzes, and progress analytics.">
+    
+    <!-- Google Fonts: Space Grotesk & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        indigoPrimary: '#4F46E5',
+                        indigoHover: '#4338CA',
+                        mintAccent: '#10B981',
+                        mintHover: '#059669',
+                        warmBg: '#FAFAF9',
+                        warmCard: '#FFFFFF',
+                        darkBg: '#0F172A',
+                        darkCard: '#1E293B',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        heading: ['Space Grotesk', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Alpine.js & Plugins -->
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/persist@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@alpinejs/intersect@3.x.x/dist/cdn.min.js"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    
+    <!-- HTMX & SSE Extension -->
+    <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+    <script src="https://unpkg.com/htmx.org@1.9.12/dist/ext/sse.js"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Highlight.js Code Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
+    <!-- KaTeX LaTeX Render -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/katex.min.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.10/dist/contrib/auto-render.min.js" defer></script>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #CBD5E1;
+            border-radius: 9999px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        /* Smooth Fade In Animation */
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-out forwards;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Shake animation for errors */
+        .animate-shake {
+            animation: shake 0.4s cubic-bezier(.36,.07,.19,.97) both;
+        }
+        @keyframes shake {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+    </style>
+</head>
+<body class="bg-warmBg text-slate-800 dark:bg-darkBg dark:text-slate-100 min-h-screen flex flex-col transition-colors duration-200">
+
+    <!-- Sticky Navigation Bar -->
+    <nav class="sticky top-0 z-50 backdrop-blur-md bg-white/80 dark:bg-darkCard/80 border-b border-slate-200/80 dark:border-slate-800 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                
+                <!-- Logo & Brand -->
+                <div class="flex items-center space-x-3">
+                    <a href="/" class="flex items-center space-x-2.5 group">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigoPrimary to-mintAccent flex items-center justify-center text-white shadow-md shadow-indigo-500/20 group-hover:scale-105 transition-transform duration-200">
+                            <i data-lucide="sparkles" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-heading font-bold text-xl tracking-tight text-slate-900 dark:text-white">
+                            AI<span class="text-indigoPrimary dark:text-indigo-400">-Tutor</span>
+                        </span>
+                    </a>
+                </div>
+
+                <!-- Desktop Navigation Links -->
+                <div class="hidden md:flex items-center space-x-1 lg:space-x-2">
+                    <a href="/subjects" class="px-3.5 py-2 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                        <i data-lucide="book-open" class="w-4 h-4 inline mr-1.5 opacity-70"></i>Subjects
+                    </a>
+                    {% if user %}
+                    <a href="/chat" class="px-3.5 py-2 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                        <i data-lucide="message-square" class="w-4 h-4 inline mr-1.5 opacity-70"></i>AI Chat
+                    </a>
+                    <a href="/quiz" class="px-3.5 py-2 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                        <i data-lucide="help-circle" class="w-4 h-4 inline mr-1.5 opacity-70"></i>Quizzes
+                    </a>
+                    <a href="/dashboard" class="px-3.5 py-2 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                        <i data-lucide="bar-chart-3" class="w-4 h-4 inline mr-1.5 opacity-70"></i>Dashboard
+                    </a>
+                    {% endif %}
+                    <a href="/billing" class="px-3.5 py-2 rounded-xl text-sm font-medium hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-colors">
+                        <i data-lucide="crown" class="w-4 h-4 inline mr-1.5 text-amber-500"></i>Pricing
+                    </a>
+                </div>
+
+                <!-- Right Actions: Gamification & Profile / Auth -->
+                <div class="flex items-center space-x-3">
+                    
+                    <!-- Dark Mode Toggle -->
+                    <button @click="darkMode = !darkMode" class="p-2 rounded-xl text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors" title="Toggle Dark Mode">
+                        <i x-show="!darkMode" data-lucide="moon" class="w-5 h-5"></i>
+                        <i x-show="darkMode" data-lucide="sun" class="w-5 h-5"></i>
+                    </button>
+
+                    {% if user %}
+                    <!-- Streak Flame & Level XP Pill -->
+                    <div class="hidden sm:flex items-center space-x-2 bg-slate-100 dark:bg-slate-800 px-3 py-1.5 rounded-full text-xs font-semibold">
+                        <span class="flex items-center text-amber-600 dark:text-amber-400" title="Daily Streak">
+                            <i data-lucide="flame" class="w-4 h-4 mr-1 fill-amber-500 animate-pulse"></i> {{ user.streak_count }}d
+                        </span>
+                        <span class="text-slate-300 dark:text-slate-600">|</span>
+                        <span class="text-indigo-600 dark:text-indigo-400">
+                            Lvl {{ 1 + (user.total_xp // 100) }} ({{ user.total_xp }} XP)
+                        </span>
+                        {% if user.is_pro %}
+                        <span class="ml-1 bg-gradient-to-r from-amber-500 to-amber-600 text-white px-1.5 py-0.5 rounded text-[10px] uppercase font-bold tracking-wider">PRO</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- User Menu / Logout -->
+                    <div class="relative" x-data="{ open: false }">
+                        <button @click="open = !open" class="flex items-center space-x-2 focus:outline-none">
+                            <div class="w-9 h-9 rounded-xl bg-indigo-100 text-indigo-700 dark:bg-indigo-950 dark:text-indigo-300 font-bold flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
+                                {{ user.full_name[:1].upper() }}
+                            </div>
+                        </button>
+                        <div x-show="open" @click.away="open = false" x-transition.origin.top.right class="absolute right-0 mt-2 w-56 bg-white dark:bg-darkCard rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 py-2 z-50">
+                            <div class="px-4 py-2 border-b border-slate-100 dark:border-slate-800">
+                                <p class="text-sm font-semibold text-slate-900 dark:text-white truncate">{{ user.full_name }}</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 truncate">{{ user.email }}</p>
+                            </div>
+                            <a href="/dashboard" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <i data-lucide="user" class="w-4 h-4 inline mr-2 opacity-70"></i> My Account
+                            </a>
+                            <a href="/parent/{{ user.parent_share_token }}" target="_blank" class="block px-4 py-2 text-sm text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800">
+                                <i data-lucide="share-2" class="w-4 h-4 inline mr-2 opacity-70"></i> Parent Share Link
+                            </a>
+                            <div class="border-t border-slate-100 dark:border-slate-800 my-1"></div>
+                            <a href="/auth/logout" class="block px-4 py-2 text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30">
+                                <i data-lucide="log-out" class="w-4 h-4 inline mr-2 opacity-70"></i> Sign Out
+                            </a>
+                        </div>
+                    </div>
+                    {% else %}
+                    <a href="/auth/login" class="text-sm font-semibold text-slate-700 dark:text-slate-200 hover:text-indigoPrimary px-3 py-2">
+                        Sign In
+                    </a>
+                    <a href="/auth/signup" class="bg-indigoPrimary hover:bg-indigoHover text-white text-sm font-medium px-4 py-2 rounded-xl shadow-md shadow-indigo-500/20 hover:shadow-indigo-500/30 transition-all">
+                        Get Started Free
+                    </a>
+                    {% endif %}
+
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Body Content -->
+    <main class="flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-darkCard border-t border-slate-200 dark:border-slate-800 py-10 mt-16 transition-colors">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+            <div class="flex items-center space-x-2">
+                <div class="w-7 h-7 rounded-lg bg-gradient-to-tr from-indigoPrimary to-mintAccent flex items-center justify-center text-white text-xs font-bold">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                <span class="font-heading font-bold text-slate-800 dark:text-white">AI-Tutor</span>
+                <span class="text-xs text-slate-500 dark:text-slate-400">© 2026 AI-Tutor Platform. All rights reserved.</span>
+            </div>
+            <div class="flex items-center space-x-6 text-xs font-medium text-slate-500 dark:text-slate-400">
+                <a href="/subjects" class="hover:text-indigoPrimary">Subjects</a>
+                <a href="/billing" class="hover:text-indigoPrimary">Pricing</a>
+                <a href="https://render.com" target="_blank" class="hover:text-indigoPrimary">Deployed on Render</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Initialize Lucide Icons -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+        });
+        document.body.addEventListener('htmx:afterSwap', () => {
+            lucide.createIcons();
+        });
+    </script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

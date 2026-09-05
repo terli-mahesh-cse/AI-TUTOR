@@ -1,0 +1,262 @@
+{% extends "base.html" %}
+
+{% block title %}Progress Dashboard — AI-Tutor{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" x-data="{ showBadgeModal: false }">
+    
+    <!-- Top Welcome Banner -->
+    <div class="bg-gradient-to-r from-indigoPrimary via-purple-600 to-indigo-900 rounded-3xl p-6 sm:p-8 text-white shadow-xl mb-8 relative overflow-hidden">
+        <div class="relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+                <span class="text-xs uppercase font-bold tracking-wider text-indigo-200">Personal Learning Hub</span>
+                <h1 class="text-2xl sm:text-3xl font-heading font-bold mt-1">Welcome back, {{ user.full_name }}! 👋</h1>
+                <p class="text-xs sm:text-sm text-indigo-100 mt-1">Keep up your daily streak to level up your mastery score.</p>
+            </div>
+            
+            <div class="flex items-center space-x-3 bg-white/10 backdrop-blur-md px-4 py-3 rounded-2xl border border-white/20">
+                <div class="w-10 h-10 rounded-xl bg-amber-500 text-white flex items-center justify-center font-bold">
+                    <i data-lucide="crown" class="w-5 h-5"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-indigo-200 font-semibold">Current Level</p>
+                    <p class="text-lg font-heading font-bold">Level {{ user_level }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 4 Stats Cards Grid -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        
+        <!-- Stat 1: Daily Streak -->
+        <div class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 flex items-center justify-center">
+                <i data-lucide="flame" class="w-6 h-6 fill-amber-500 animate-pulse"></i>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Streak Count</p>
+                <p class="text-2xl font-heading font-bold text-slate-900 dark:text-white">{{ user.streak_count }} Days</p>
+            </div>
+        </div>
+
+        <!-- Stat 2: Total XP -->
+        <div class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-2xl bg-indigo-100 dark:bg-indigo-950 text-indigoPrimary flex items-center justify-center">
+                <i data-lucide="zap" class="w-6 h-6 fill-indigoPrimary"></i>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Total XP</p>
+                <p class="text-2xl font-heading font-bold text-slate-900 dark:text-white">{{ user.total_xp }} XP</p>
+            </div>
+        </div>
+
+        <!-- Stat 3: Quizzes Completed -->
+        <div class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 flex items-center justify-center">
+                <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Quizzes Taken</p>
+                <p class="text-2xl font-heading font-bold text-slate-900 dark:text-white">{{ total_quizzes }}</p>
+            </div>
+        </div>
+
+        <!-- Stat 4: Badges Unlocked -->
+        <div class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm flex items-center space-x-4 cursor-pointer hover:border-indigoPrimary transition-colors" @click="showBadgeModal = true">
+            <div class="w-12 h-12 rounded-2xl bg-purple-100 dark:bg-purple-950 text-purple-600 flex items-center justify-center">
+                <i data-lucide="award" class="w-6 h-6"></i>
+            </div>
+            <div>
+                <p class="text-xs font-semibold uppercase tracking-wider text-slate-400">Badges</p>
+                <p class="text-2xl font-heading font-bold text-slate-900 dark:text-white">{{ unlocked_badges|length }} Unlocked</p>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Main Grid: Score Trend Graph + Weak Areas & Heatmap -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Left 2 Cols: Chart.js Score Trend & Heatmap -->
+        <div class="lg:col-span-2 space-y-8">
+            
+            <!-- Quiz Score Trend Chart Card -->
+            <div class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center justify-between mb-6">
+                    <h2 class="font-heading font-bold text-lg text-slate-900 dark:text-white">Quiz Score Trend</h2>
+                    <span class="text-xs text-slate-400">Last 10 Attempts</span>
+                </div>
+                <div class="h-64 relative">
+                    <canvas id="quizChart"></canvas>
+                </div>
+            </div>
+
+            <!-- GitHub-Style Streak Heatmap Grid -->
+            <div class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-heading font-bold text-lg text-slate-900 dark:text-white">28-Day Activity Heatmap</h2>
+                    <span class="text-xs text-slate-400">Daily Study Contributions</span>
+                </div>
+                <div class="grid grid-cols-7 sm:grid-cols-14 gap-2">
+                    {% for day in heatmap_days %}
+                    <div class="h-8 rounded-lg flex items-center justify-center text-[10px] font-mono transition-transform hover:scale-110 {% if day.active %}bg-gradient-to-tr from-mintAccent to-emerald-400 text-white font-bold shadow-sm{% else %}bg-slate-100 dark:bg-slate-800 text-slate-400{% endif %}" title="{{ day.date }}: {% if day.active %}Active{% else %}Inactive{% endif %}">
+                        {{ day.date.split(' ')[1] }}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Col: Weak Areas List & Badge Showcase -->
+        <div class="space-y-8">
+            
+            <!-- Weak Areas Card (Auto-derived from lowest quiz scores) -->
+            <div class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center space-x-2 mb-4">
+                    <i data-lucide="alert-triangle" class="w-5 h-5 text-amber-500"></i>
+                    <h2 class="font-heading font-bold text-lg text-slate-900 dark:text-white">Recommended Remediation</h2>
+                </div>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Topics with average quiz scores below 75%:</p>
+
+                {% if weak_areas %}
+                <div class="space-y-3">
+                    {% for w in weak_areas %}
+                    <div class="p-3.5 rounded-2xl bg-amber-50/60 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/40 flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-bold text-slate-900 dark:text-white">{{ w.topic_title }}</p>
+                            <p class="text-[11px] text-amber-700 dark:text-amber-400 mt-0.5">Avg Score: {{ w.avg_score }}% ({{ w.attempt_count }} tests)</p>
+                        </div>
+                        <a href="/chat?topic={{ w.topic_title | escape }}" class="px-3 py-1.5 rounded-xl bg-amber-600 text-white font-semibold text-[11px] hover:bg-amber-700">
+                            Practice
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-6 rounded-2xl bg-slate-50 dark:bg-slate-900 text-center">
+                    <i data-lucide="check-circle-2" class="w-8 h-8 text-mintAccent mx-auto mb-2"></i>
+                    <p class="text-xs font-bold text-slate-800 dark:text-slate-200">No Weak Areas Identified!</p>
+                    <p class="text-[11px] text-slate-400 mt-1">Keep taking quizzes to monitor your mastery.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Unlocked Badges Quick Showcase -->
+            <div class="bg-white dark:bg-darkCard p-6 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm">
+                <div class="flex items-center justify-between mb-4">
+                    <h2 class="font-heading font-bold text-lg text-slate-900 dark:text-white">Achievements</h2>
+                    <button @click="showBadgeModal = true" class="text-xs font-semibold text-indigoPrimary hover:underline">
+                        View All
+                    </button>
+                </div>
+                <div class="flex flex-wrap gap-3">
+                    {% for badge in unlocked_badges %}
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-white flex items-center justify-center shadow-md" title="{{ badge.title }}: {{ badge.description }}">
+                        <i data-lucide="{{ badge.icon }}" class="w-6 h-6"></i>
+                    </div>
+                    {% endfor %}
+                    {% if not unlocked_badges %}
+                    <p class="text-xs text-slate-400">Complete your first quiz to unlock badges!</p>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- Badges Pop-in Modal -->
+    <div x-show="showBadgeModal" x-cloak class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm" x-transition.opacity>
+        <div @click.away="showBadgeModal = false" class="bg-white dark:bg-darkCard max-w-lg w-full rounded-3xl p-6 sm:p-8 border border-slate-200 dark:border-slate-800 shadow-2xl animate-fade-in">
+            <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+                <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white flex items-center">
+                    <i data-lucide="award" class="w-6 h-6 text-amber-500 mr-2"></i> Badge Gallery
+                </h3>
+                <button @click="showBadgeModal = false" class="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+
+            <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+                <!-- Unlocked -->
+                {% for b in unlocked_badges %}
+                <div class="p-4 rounded-2xl bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-900/50 flex items-center space-x-4">
+                    <div class="w-12 h-12 rounded-2xl bg-gradient-to-tr from-amber-400 to-amber-600 text-white flex items-center justify-center shadow-md flex-shrink-0">
+                        <i data-lucide="{{ b.icon }}" class="w-6 h-6"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm text-slate-900 dark:text-white flex items-center">
+                            {{ b.title }} <span class="ml-2 text-[10px] bg-amber-500 text-white px-1.5 py-0.5 rounded font-bold uppercase">UNLOCKED</span>
+                        </p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ b.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+
+                <!-- Locked -->
+                {% for b in locked_badges %}
+                <div class="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-center space-x-4 opacity-50">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-200 dark:bg-slate-800 text-slate-400 flex items-center justify-center flex-shrink-0">
+                        <i data-lucide="lock" class="w-5 h-5"></i>
+                    </div>
+                    <div>
+                        <p class="font-bold text-sm text-slate-700 dark:text-slate-300">{{ b.title }}</p>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ b.description }}</p>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const ctx = document.getElementById('quizChart');
+    if (!ctx) return;
+
+    const dates = {{ chart_dates | tojson }};
+    const scores = {{ chart_scores | tojson }};
+
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: dates.length > 0 ? dates : ['No Data'],
+            datasets: [{
+                label: 'Quiz Score (%)',
+                data: scores.length > 0 ? scores : [0],
+                borderColor: '#4F46E5',
+                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                fill: true,
+                tension: 0.35,
+                borderWidth: 3,
+                pointRadius: 5,
+                pointBackgroundColor: '#10B981'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    min: 0,
+                    max: 100,
+                    grid: { color: 'rgba(203, 213, 225, 0.2)' }
+                },
+                x: {
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

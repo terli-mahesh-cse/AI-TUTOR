@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}{{ subject.name }} — Curriculum — AI-Tutor{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 py-10">
+    
+    <!-- Subject Header Card -->
+    <div class="bg-white dark:bg-darkCard rounded-3xl p-8 border border-slate-200 dark:border-slate-800 shadow-sm mb-8 flex items-center space-x-6">
+        <div class="w-16 h-16 rounded-2xl bg-indigo-100 dark:bg-indigo-950 text-indigoPrimary flex items-center justify-center flex-shrink-0">
+            <i data-lucide="{{ subject.icon }}" class="w-8 h-8"></i>
+        </div>
+        <div>
+            <h1 class="text-3xl font-heading font-bold text-slate-900 dark:text-white">{{ subject.name }} Mastery Track</h1>
+            <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">{{ subject.description }}</p>
+        </div>
+    </div>
+
+    <!-- Topics List -->
+    <h2 class="text-xl font-heading font-bold text-slate-900 dark:text-white mb-4">Topic Lessons</h2>
+    <div class="space-y-4">
+        {% for lesson in lessons %}
+        {% set is_passed = lesson.title in passed_topics %}
+        <div class="bg-white dark:bg-darkCard p-6 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="flex items-start space-x-4">
+                <div class="w-8 h-8 rounded-full {% if is_passed %}bg-emerald-100 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400{% else %}bg-slate-100 text-slate-400 dark:bg-slate-800{% endif %} font-bold flex items-center justify-center text-xs flex-shrink-0 mt-0.5">
+                    {% if is_passed %}
+                    <i data-lucide="check" class="w-5 h-5"></i>
+                    {% else %}
+                    {{ lesson.order }}
+                    {% endif %}
+                </div>
+                <div>
+                    <h3 class="font-heading font-bold text-base text-slate-900 dark:text-white">{{ lesson.title }}</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">{{ lesson.summary }}</p>
+                </div>
+            </div>
+
+            <!-- Action buttons -->
+            <div class="flex items-center space-x-2 sm:flex-shrink-0">
+                <a href="/chat?subject_id={{ subject.id }}&lesson_id={{ lesson.id }}" class="px-4 py-2 rounded-xl bg-indigoPrimary hover:bg-indigoHover text-white text-xs font-semibold shadow-sm transition-colors">
+                    Start Tutor Chat
+                </a>
+                <a href="/quiz?subject_id={{ subject.id }}&lesson_id={{ lesson.id }}" class="px-4 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors">
+                    Take Quiz
+                </a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}AI Tutor Workspace — AI-Tutor{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 py-6" x-data="chatWorkspace({
+    subjectId: {{ active_subject.id if active_subject else 'null' }},
+    lessonId: {{ active_lesson.id if active_lesson else 'null' }},
+    initialPrompt: '{{ initial_prompt | escape }}'
+})">
+    
+    <!-- Top Header & Socratic Mode Toggle Bar -->
+    <div class="bg-white dark:bg-darkCard rounded-2xl p-4 sm:p-5 mb-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        
+        <!-- Left: Subject / Topic info -->
+        <div class="flex items-center space-x-3">
+            <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigoPrimary font-bold flex items-center justify-center">
+                <i data-lucide="{% if active_subject %}{{ active_subject.icon }}{% else %}sparkles{% endif %}" class="w-5 h-5"></i>
+            </div>
+            <div>
+                <h1 class="font-heading font-bold text-lg text-slate-900 dark:text-white flex items-center">
+                    {% if active_subject %}{{ active_subject.name }}{% else %}General Tutoring{% endif %}
+                    {% if active_lesson %}
+                    <span class="text-xs font-normal text-slate-400 dark:text-slate-500 ml-2">/ {{ active_lesson.title }}</span>
+                    {% endif %}
+                </h1>
+                <p class="text-xs text-slate-500 dark:text-slate-400">
+                    {% if user.is_pro %}
+                    <span class="text-emerald-600 dark:text-emerald-400 font-semibold">Pro Unlimited Messages</span>
+                    {% else %}
+                    <span>Daily Quota: <strong>{{ msg_count }} / {{ max_free_msgs }}</strong> messages used</span>
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <!-- Right: Controls (Socratic Mode Toggle + Quick Quiz Launch) -->
+        <div class="flex items-center space-x-4">
+            
+            <!-- Socratic Mode Toggle -->
+            <div class="flex items-center space-x-2 bg-slate-100 dark:bg-slate-800/80 p-1.5 rounded-xl border border-slate-200 dark:border-slate-700">
+                <span class="text-xs font-semibold px-2 text-slate-700 dark:text-slate-300">Socratic Mode</span>
+                <button type="button" @click="isSocratic = !isSocratic" :class="isSocratic ? 'bg-indigoPrimary' : 'bg-slate-300 dark:bg-slate-600'" class="relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none">
+                    <span :class="isSocratic ? 'translate-x-5' : 'translate-x-0'" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out"></span>
+                </button>
+            </div>
+
+            <!-- Quiz Launcher Button -->
+            <a href="/quiz?{% if active_subject %}subject_id={{ active_subject.id }}{% endif %}{% if active_lesson %}&lesson_id={{ active_lesson.id }}{% endif %}" class="px-3.5 py-2 rounded-xl bg-mintAccent/10 text-mintAccent hover:bg-mintAccent/20 font-semibold text-xs flex items-center space-x-1.5 transition-colors">
+                <i data-lucide="help-circle" class="w-4 h-4"></i>
+                <span>Test Topic</span>
+            </a>
+
+        </div>
+    </div>
+
+    <!-- Main Chat Window Card -->
+    <div class="bg-white dark:bg-darkCard rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xl flex flex-col h-[70vh] overflow-hidden">
+        
+        <!-- Messages Container -->
+        <div x-ref="messagesContainer" class="flex-grow p-4 sm:p-6 overflow-y-auto space-y-6">
+            
+            <!-- Welcome Banner if no messages -->
+            {% if not messages %}
+            <div class="text-center py-12 px-4 max-w-md mx-auto">
+                <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-indigoPrimary to-mintAccent text-white flex items-center justify-center mx-auto mb-4 shadow-lg shadow-indigo-500/20 animate-bounce">
+                    <i data-lucide="bot" class="w-8 h-8"></i>
+                </div>
+                <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white">Hello {{ user.full_name.split(' ')[0] }}!</h3>
+                <p class="text-sm text-slate-500 dark:text-slate-400 mt-2">
+                    I am your AI Socratic Tutor. Ask me any concept, paste a math problem, or ask for code explanations!
+                </p>
+            </div>
+            {% endif %}
+
+            <!-- Past Messages loop from DB -->
+            {% for msg in messages %}
+            <div class="flex items-start space-x-3 {% if msg.sender == 'student' %}justify-end{% endif %} animate-fade-in">
+                {% if msg.sender == 'tutor' %}
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigoPrimary to-mintAccent text-white font-bold flex items-center justify-center flex-shrink-0 text-xs shadow-sm">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                {% endif %}
+
+                <div class="max-w-2xl p-4 rounded-2xl text-sm leading-relaxed {% if msg.sender == 'student' %}bg-indigoPrimary text-white rounded-tr-none shadow-md shadow-indigo-500/10{% else %}bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 rounded-tl-none border border-slate-200/60 dark:border-slate-700/60{% endif %}">
+                    <div class="prose dark:prose-invert max-w-none break-words message-content">{{ msg.content }}</div>
+                </div>
+
+                {% if msg.sender == 'student' %}
+                <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigoPrimary font-bold flex items-center justify-center flex-shrink-0 text-xs border border-indigo-200 dark:border-indigo-800">
+                    {{ user.full_name[:1].upper() }}
+                </div>
+                {% endif %}
+            </div>
+            {% endfor %}
+
+            <!-- Dynamic Live Streaming Container -->
+            <template x-for="(msg, index) in liveMessages" :key="index">
+                <div class="flex items-start space-x-3" :class="msg.sender === 'student' ? 'justify-end' : ''">
+                    <template x-if="msg.sender === 'tutor'">
+                        <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigoPrimary to-mintAccent text-white font-bold flex items-center justify-center flex-shrink-0 text-xs shadow-sm">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        </div>
+                    </template>
+
+                    <div class="max-w-2xl p-4 rounded-2xl text-sm leading-relaxed" :class="msg.sender === 'student' ? 'bg-indigoPrimary text-white rounded-tr-none shadow-md shadow-indigo-500/10' : 'bg-slate-100 dark:bg-slate-800/90 text-slate-800 dark:text-slate-100 rounded-tl-none border border-slate-200/60 dark:border-slate-700/60'">
+                        <div class="prose dark:prose-invert max-w-none break-words message-content" x-html="renderFormatted(msg.content)"></div>
+                    </div>
+
+                    <template x-if="msg.sender === 'student'">
+                        <div class="w-8 h-8 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigoPrimary font-bold flex items-center justify-center flex-shrink-0 text-xs border border-indigo-200 dark:border-indigo-800">
+                            {{ user.full_name[:1].upper() }}
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <!-- Typing Indicator (Animated Dots) -->
+            <div x-show="isStreaming && isWaitingFirstToken" class="flex items-start space-x-3">
+                <div class="w-8 h-8 rounded-xl bg-gradient-to-tr from-indigoPrimary to-mintAccent text-white font-bold flex items-center justify-center flex-shrink-0 text-xs">
+                    <i data-lucide="sparkles" class="w-4 h-4"></i>
+                </div>
+                <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-2xl rounded-tl-none flex items-center space-x-1.5">
+                    <span class="w-2 h-2 rounded-full bg-indigoPrimary animate-bounce"></span>
+                    <span class="w-2 h-2 rounded-full bg-indigoPrimary animate-bounce" style="animation-delay: 0.15s"></span>
+                    <span class="w-2 h-2 rounded-full bg-indigoPrimary animate-bounce" style="animation-delay: 0.3s"></span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Chat Input Footer -->
+        <div class="p-4 bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800">
+            <form @submit.prevent="sendMessage()" class="flex items-center space-x-3">
+                <input type="text" x-model="inputContent" :disabled="isStreaming" placeholder="Ask a question or explain your thought process..."
+                    class="flex-grow px-4 py-3.5 rounded-2xl bg-white dark:bg-darkCard border border-slate-200 dark:border-slate-800 text-sm focus:outline-none focus:ring-2 focus:ring-indigoPrimary transition-all disabled:opacity-50">
+                
+                <button type="submit" :disabled="isStreaming || !inputContent.trim()" class="px-5 py-3.5 rounded-2xl bg-indigoPrimary hover:bg-indigoHover text-white font-semibold text-sm shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center space-x-1.5">
+                    <span>Send</span>
+                    <i data-lucide="send" class="w-4 h-4"></i>
+                </button>
+            </form>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function chatWorkspace(config) {
+    return {
+        subjectId: config.subjectId,
+        lessonId: config.lessonId,
+        inputContent: config.initialPrompt || '',
+        isSocratic: true,
+        isStreaming: false,
+        isWaitingFirstToken: false,
+        liveMessages: [],
+
+        init() {
+            this.renderMathAndCode();
+            this.scrollToBottom();
+            if (config.initialPrompt) {
+                // Pre-seeded prompt available
+            }
+        },
+
+        scrollToBottom() {
+            this.$nextTick(() => {
+                const el = this.$refs.messagesContainer;
+                if (el) el.scrollTop = el.scrollHeight;
+            });
+        },
+
+        renderFormatted(content) {
+            // Basic HTML line break & markdown code block escape
+            if (!content) return '';
+            let formatted = content
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/\n/g, '<br>');
+            return formatted;
+        },
+
+        renderMathAndCode() {
+            this.$nextTick(() => {
+                // Highlight.js
+                document.querySelectorAll('pre code').forEach((block) => {
+                    hljs.highlightElement(block);
+                });
+                // KaTeX render
+                if (window.renderMathInElement) {
+                    renderMathInElement(document.body, {
+                        delimiters: [
+                            {left: '$$', right: '$$', display: true},
+                            {left: '$', right: '$', display: false}
+                        ],
+                        throwOnError: false
+                    });
+                }
+            });
+        },
+
+        async sendMessage() {
+            const text = this.inputContent.trim();
+            if (!text || this.isStreaming) return;
+
+            // Add student message to live array
+            this.liveMessages.push({ sender: 'student', content: text });
+            this.inputContent = '';
+            this.isStreaming = true;
+            this.isWaitingFirstToken = true;
+            this.scrollToBottom();
+
+            // Submit user message to POST endpoint
+            const formData = new FormData();
+            formData.append('content', text);
+            if (this.subjectId) formData.append('subject_id', this.subjectId);
+            if (this.lessonId) formData.append('lesson_id', this.lessonId);
+            formData.append('is_socratic', this.isSocratic);
+
+            try {
+                await fetch('/chat/send', { method: 'POST', body: formData });
+            } catch (err) {
+                console.error('Error saving student msg', err);
+            }
+
+            // Prepare tutor live streaming message placeholder
+            const tutorMsgObj = { sender: 'tutor', content: '' };
+            this.liveMessages.push(tutorMsgObj);
+
+            // Connect to EventSource for token stream
+            const params = new URLSearchParams({
+                content: text,
+                is_socratic: this.isSocratic
+            });
+            if (this.subjectId) params.append('subject_id', this.subjectId);
+            if (this.lessonId) params.append('lesson_id', this.lessonId);
+
+            const eventSource = new EventSource('/chat/stream?' + params.toString());
+
+            eventSource.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.done) {
+                    eventSource.close();
+                    this.isStreaming = false;
+                    this.isWaitingFirstToken = false;
+                    this.renderMathAndCode();
+                    return;
+                }
+                if (data.token) {
+                    this.isWaitingFirstToken = false;
+                    tutorMsgObj.content += data.token;
+                    this.scrollToBottom();
+                }
+            };
+
+            eventSource.onerror = (err) => {
+                console.error('EventSource error', err);
+                eventSource.close();
+                this.isStreaming = false;
+                this.isWaitingFirstToken = false;
+                this.renderMathAndCode();
+            };
+        }
+    };
+}
+</script>
+{% endblock %}

@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}AI-Tutor — Next-Gen AI Tutoring Platform{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="relative overflow-hidden pt-12 pb-24 lg:pt-20 lg:pb-32 bg-gradient-to-b from-indigo-50/50 via-warmBg to-warmBg dark:from-indigo-950/20 dark:via-darkBg dark:to-darkBg">
+    <!-- Background Animated Gradient Orbs -->
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-96 pointer-events-none overflow-hidden opacity-30 dark:opacity-20">
+        <div class="absolute -top-24 left-1/4 w-96 h-96 bg-indigoPrimary rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute top-10 right-1/4 w-96 h-96 bg-mintAccent rounded-full blur-3xl animate-pulse" style="animation-delay: 2s;"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        
+        <!-- Badge -->
+        <div class="inline-flex items-center space-x-2 px-3.5 py-1.5 rounded-full bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 text-xs font-semibold mb-6 border border-indigo-200 dark:border-indigo-800">
+            <span class="w-2 h-2 rounded-full bg-mintAccent animate-ping"></span>
+            <span>Powered by Claude Sonnet AI & Socratic Learning</span>
+        </div>
+
+        <!-- Headline -->
+        <h1 class="text-4xl sm:text-6xl lg:text-7xl font-heading font-extrabold text-slate-900 dark:text-white tracking-tight leading-[1.15] max-w-4xl mx-auto">
+            Master Any Subject with an <span class="bg-gradient-to-r from-indigoPrimary via-purple-600 to-mintAccent bg-clip-text text-transparent">AI Tutor</span> That Thinks With You
+        </h1>
+
+        <!-- Subtitle -->
+        <p class="mt-6 text-lg sm:text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto font-normal leading-relaxed">
+            Stop struggling with static videos. Get instant 1-on-1 Socratic guidance, real-time code execution support, step-by-step LaTeX math breakdowns, and custom adaptive quizzes.
+        </p>
+
+        <!-- CTA Buttons -->
+        <div class="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a href="{% if user %}/dashboard{% else %}/auth/signup{% endif %}" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-indigoPrimary hover:bg-indigoHover text-white font-semibold text-base shadow-lg shadow-indigo-500/30 hover:shadow-indigo-500/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-2">
+                <span>Start Learning Free</span>
+                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+            </a>
+            <a href="/subjects" class="w-full sm:w-auto px-8 py-4 rounded-2xl bg-white dark:bg-darkCard hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-base border border-slate-200 dark:border-slate-800 shadow-sm hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center space-x-2">
+                <i data-lucide="compass" class="w-5 h-5 text-indigoPrimary"></i>
+                <span>Explore Subjects</span>
+            </a>
+        </div>
+
+        <!-- Interactive Preview Teaser Card -->
+        <div class="mt-14 max-w-4xl mx-auto rounded-2xl p-2 bg-gradient-to-r from-indigo-500/20 via-purple-500/20 to-mintAccent/20 border border-slate-200 dark:border-slate-800 shadow-2xl">
+            <div class="bg-white dark:bg-darkCard rounded-xl p-6 text-left shadow-inner">
+                <div class="flex items-center space-x-3 pb-4 border-b border-slate-100 dark:border-slate-800">
+                    <div class="flex space-x-1.5">
+                        <span class="w-3 h-3 rounded-full bg-rose-400"></span>
+                        <span class="w-3 h-3 rounded-full bg-amber-400"></span>
+                        <span class="w-3 h-3 rounded-full bg-emerald-400"></span>
+                    </div>
+                    <span class="text-xs font-mono text-slate-400">AI-Tutor Socratic Interactive Workspace</span>
+                </div>
+                <div class="py-4 space-y-4 font-sans text-sm">
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950 text-indigo-600 font-bold flex items-center justify-center text-xs">You</div>
+                        <div class="bg-slate-100 dark:bg-slate-800 p-3 rounded-2xl rounded-tl-none max-w-xl text-slate-700 dark:text-slate-200">
+                            I don't get how derivatives work in calculus. Is it just finding the slope?
+                        </div>
+                    </div>
+                    <div class="flex items-start space-x-3">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-indigoPrimary to-mintAccent text-white font-bold flex items-center justify-center text-xs">
+                            <i data-lucide="sparkles" class="w-4 h-4"></i>
+                        </div>
+                        <div class="bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/50 p-4 rounded-2xl rounded-tl-none max-w-xl text-slate-800 dark:text-slate-100">
+                            <p class="font-medium">Exactly! You nailed the core intuition.</p>
+                            <p class="mt-2">Imagine you're driving a car. Your speedometer shows your speed at the <em>exact second</em> you look at it. How is that different from calculating your average speed over the whole hour trip?</p>
+                            <div class="mt-3 bg-white dark:bg-slate-900 p-2.5 rounded-lg border border-indigo-200 dark:border-indigo-800 font-mono text-xs text-indigo-600 dark:text-indigo-400">
+                                $$f'(x) = \lim_{h \to 0} \frac{f(x+h) - f(x)}{h}$$
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</section>
+
+<!-- Subject Auto-Scroll Carousel Section -->
+<section class="py-16 bg-white dark:bg-darkCard border-y border-slate-200/80 dark:border-slate-800 transition-colors" x-data="{
+    scrollPos: 0,
+    scrollNext() {
+        $refs.carousel.scrollBy({ left: 300, behavior: 'smooth' });
+    },
+    scrollPrev() {
+        $refs.carousel.scrollBy({ left: -300, behavior: 'smooth' });
+    }
+}">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-end justify-between mb-8">
+            <div>
+                <span class="text-xs font-bold uppercase tracking-wider text-indigoPrimary dark:text-indigo-400">Subject Catalog</span>
+                <h2 class="text-2xl sm:text-3xl font-heading font-bold text-slate-900 dark:text-white mt-1">Explore Popular Learning Tracks</h2>
+            </div>
+            <div class="flex space-x-2">
+                <button @click="scrollPrev()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                </button>
+                <button @click="scrollNext()" class="p-2.5 rounded-xl border border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+            </div>
+        </div>
+
+        <div x-ref="carousel" class="flex space-x-6 overflow-x-auto pb-4 scrollbar-none scroll-smooth">
+            <!-- Math -->
+            <div class="flex-none w-72 bg-warmBg dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                <div class="w-12 h-12 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigoPrimary font-bold flex items-center justify-center mb-4">
+                    <i data-lucide="calculator" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-heading font-bold text-lg text-slate-900 dark:text-white">Mathematics</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Algebra, Limits & Calculus, Geometry, Statistics & Probability.</p>
+                <a href="/subjects/math" class="inline-flex items-center text-xs font-semibold text-indigoPrimary mt-4 hover:underline">
+                    View 4 Topics <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Coding -->
+            <div class="flex-none w-72 bg-warmBg dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                <div class="w-12 h-12 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 font-bold flex items-center justify-center mb-4">
+                    <i data-lucide="code" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-heading font-bold text-lg text-slate-900 dark:text-white">Computer Science</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Python, Big-O Data Structures, Web Development, SQL Databases.</p>
+                <a href="/subjects/coding" class="inline-flex items-center text-xs font-semibold text-emerald-600 mt-4 hover:underline">
+                    View 4 Topics <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Science -->
+            <div class="flex-none w-72 bg-warmBg dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                <div class="w-12 h-12 rounded-xl bg-rose-100 dark:bg-rose-950 text-rose-600 font-bold flex items-center justify-center mb-4">
+                    <i data-lucide="flask-conical" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-heading font-bold text-lg text-slate-900 dark:text-white">Natural Sciences</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Newtonian Mechanics, Cellular Respiration, Chemical Bonding.</p>
+                <a href="/subjects/science" class="inline-flex items-center text-xs font-semibold text-rose-600 mt-4 hover:underline">
+                    View 3 Topics <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Languages -->
+            <div class="flex-none w-72 bg-warmBg dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                <div class="w-12 h-12 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 font-bold flex items-center justify-center mb-4">
+                    <i data-lucide="languages" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-heading font-bold text-lg text-slate-900 dark:text-white">World Languages</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">Conversational Spanish, French Past Tenses, Japanese Grammar.</p>
+                <a href="/subjects/languages" class="inline-flex items-center text-xs font-semibold text-amber-600 mt-4 hover:underline">
+                    View 3 Topics <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                </a>
+            </div>
+
+            <!-- Test Prep -->
+            <div class="flex-none w-72 bg-warmBg dark:bg-slate-900 p-6 rounded-2xl border border-slate-200 dark:border-slate-800 hover:-translate-y-1 hover:shadow-lg transition-all duration-200">
+                <div class="w-12 h-12 rounded-xl bg-purple-100 dark:bg-purple-950 text-purple-600 font-bold flex items-center justify-center mb-4">
+                    <i data-lucide="graduation-cap" class="w-6 h-6"></i>
+                </div>
+                <h3 class="font-heading font-bold text-lg text-slate-900 dark:text-white">Test Preparation</h3>
+                <p class="text-xs text-slate-500 dark:text-slate-400 mt-2">SAT Math High-Yield Hacks, GRE Advanced Verbal Completion.</p>
+                <a href="/subjects/test-prep" class="inline-flex items-center text-xs font-semibold text-purple-600 mt-4 hover:underline">
+                    View 2 Topics <i data-lucide="arrow-right" class="w-3.5 h-3.5 ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Feature Grid with Hover Lift Animations -->
+<section class="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="text-center max-w-2xl mx-auto mb-16" x-data x-intersect="$el.classList.add('animate-fade-in')">
+        <span class="text-xs font-bold uppercase tracking-wider text-indigoPrimary dark:text-indigo-400">Why AI-Tutor Works</span>
+        <h2 class="text-3xl sm:text-4xl font-heading font-bold text-slate-900 dark:text-white mt-2">Built for Active Learning & Deep Mastery</h2>
+        <p class="text-slate-600 dark:text-slate-400 text-sm mt-3">Unlike passive video lectures, AI-Tutor interacts with you at every step of your learning journey.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <!-- Feature 1 -->
+        <div class="bg-white dark:bg-darkCard p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-indigo-100 dark:bg-indigo-950 text-indigoPrimary flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <i data-lucide="brain-circuit" class="w-7 h-7"></i>
+            </div>
+            <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white mb-3">Socratic Mode</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Rather than giving you answer cheat-sheets, the tutor asks tailored questions to guide your intuition and make breakthroughs stick forever.
+            </p>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="bg-white dark:bg-darkCard p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-mintAccent/20 text-mintAccent flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <i data-lucide="sparkles" class="w-7 h-7"></i>
+            </div>
+            <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white mb-3">Instant Claude AI Quizzes</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Generate 5-question adaptive quizzes on any topic instantly. Get step-by-step explanations, green/red feedback pulses, and confetti score celebrations!
+            </p>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="bg-white dark:bg-darkCard p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm hover:-translate-y-2 hover:shadow-xl transition-all duration-300 group">
+            <div class="w-14 h-14 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <i data-lucide="flame" class="w-7 h-7"></i>
+            </div>
+            <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white mb-3">XP & Streak Gamification</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                Earn XP for every lesson completed and quiz passed. Unlock milestone achievement badges and track your daily learning streak.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- Pricing Table Section -->
+<section class="py-20 bg-slate-50 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800 transition-colors">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center max-w-2xl mx-auto mb-16">
+            <span class="text-xs font-bold uppercase tracking-wider text-indigoPrimary dark:text-indigo-400">Simple Transparent Pricing</span>
+            <h2 class="text-3xl sm:text-4xl font-heading font-bold text-slate-900 dark:text-white mt-2">Invest in Your Learning Journey</h2>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Free Plan -->
+            <div class="bg-white dark:bg-darkCard p-8 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
+                <div>
+                    <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white">Free Plan</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Perfect for casual practice</p>
+                    <div class="my-6">
+                        <span class="text-4xl font-extrabold text-slate-900 dark:text-white">$0</span>
+                        <span class="text-slate-500 text-sm">/ forever</span>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>10 AI Tutor Messages per day</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>2 AI Generated Quizzes per day</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>Access to all 5 Core Subjects</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>Basic Progress Dashboard</li>
+                    </ul>
+                </div>
+                <a href="/auth/signup" class="mt-8 w-full py-3 rounded-xl border border-slate-300 dark:border-slate-700 text-center font-semibold text-sm hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                    Get Started Free
+                </a>
+            </div>
+
+            <!-- Pro Plan -->
+            <div class="bg-white dark:bg-darkCard p-8 rounded-2xl border-2 border-indigoPrimary shadow-xl relative flex flex-col justify-between">
+                <div class="absolute -top-3.5 right-6 bg-gradient-to-r from-indigoPrimary to-purple-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow">
+                    Most Popular
+                </div>
+                <div>
+                    <h3 class="font-heading font-bold text-xl text-slate-900 dark:text-white">Pro Unlimited</h3>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">For dedicated students & exam prep</p>
+                    <div class="my-6">
+                        <span class="text-4xl font-extrabold text-slate-900 dark:text-white">$9.99</span>
+                        <span class="text-slate-500 text-sm">/ month</span>
+                    </div>
+                    <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i><strong>Unlimited</strong> AI Tutor Streaming Chat</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i><strong>Unlimited</strong> Custom Topic Quizzes</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>Advanced Weak-Area Analytics</li>
+                        <li class="flex items-center"><i data-lucide="check" class="w-4 h-4 text-mintAccent mr-2.5"></i>Parent / Teacher Share Token</li>
+                    </ul>
+                </div>
+                <a href="/billing" class="mt-8 w-full py-3 rounded-xl bg-indigoPrimary hover:bg-indigoHover text-white text-center font-semibold text-sm shadow-md shadow-indigo-500/20 transition-all">
+                    Upgrade to Pro
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
